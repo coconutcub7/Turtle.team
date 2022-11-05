@@ -4,6 +4,9 @@ import pygame
 pygame.init()
 screen = pygame.display.set_mode((640,360))
 clock = pygame.time.Clock()
+background = pygame.image.load("assets\\astur\\real_real.jpg")
+background = pygame.transform.scale(background, (640, 360))
+
 
 #Variables to keep a global track of damage throughout game
 playerDamage = 0
@@ -105,6 +108,9 @@ class Enemy(pygame.sprite.Sprite):
                 self.goDown = True
                 self.goUp = False
 
+        if self.health <= 10:
+            self.image = pygame.transform.flip(pygame.image.load("C:\\Users\\pureb\\Documents\\Some_python\\Ocean Blues\\Turtle.team\\assets\\sprites\\stingray_WizardA.png"), True, False)
+
 
 
 merek = Player(480,180)
@@ -125,11 +131,13 @@ while True:
             if event.key == pygame.K_SPACE:
                 if mantaRay.health > 0:
                     if merek.health > 0:
-                        merek.attack()
-                    if mantaRay.health > 0:
-                        mantaRay.attack()
+                        if merek.health > 0:
+                            merek.attack()
+                        if mantaRay.health > 0:
+                            mantaRay.attack()
 
     pygame.display.flip()
+    screen.blit(background, (0,0))
     player_group.draw(screen)
     enemy_group.draw(screen)
     player_group.update()
