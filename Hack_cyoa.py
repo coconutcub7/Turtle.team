@@ -6,7 +6,6 @@ screen = pygame.display.set_mode((640,360))
 clock = pygame.time.Clock()
 
 playerDamage = 0
-
 enemyDamage = 0
 
 
@@ -37,12 +36,12 @@ class Player(pygame.sprite.Sprite):
                 self.Alive = False
         
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, pos_x, pos_y):
+    def __init__(self, pos_x, pos_y, hp, defense, attack):
         super().__init__()
-        self.health = 20
-        self.baseDamage = 2
+        self.health = hp
+        self.baseDamage = attack
         self.Alive = True
-        self.armor = 10
+        self.armor = defense
         self.hit = 0
 
     def attack(self):
@@ -66,7 +65,7 @@ merek = Player(0,0)
 player_group = pygame.sprite.Group()
 player_group.add(merek)
 
-mantaRay = Enemy(0,0)
+mantaRay = Enemy(0,0, 20, 10, 2)
 enemy_group = pygame.sprite.Group()
 enemy_group.add(mantaRay)
 
