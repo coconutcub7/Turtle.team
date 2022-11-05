@@ -5,6 +5,7 @@ pygame.init()
 screen = pygame.display.set_mode((640,360))
 clock = pygame.time.Clock()
 
+#Variables to keep a global track of damage throughout game
 playerDamage = 0
 enemyDamage = 0
 
@@ -13,6 +14,7 @@ enemyDamage = 0
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):
         super().__init__()
+        #Initiating variables for the player, who is Merek
         self.health = 20
         self.baseDamage = 2
         self.armor = 12
@@ -28,8 +30,8 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = [pos_x, pos_y]
 
-    def attack(self):
-        global playerDamage
+    def attack(self): 
+        global playerDamage #Damage that will be applied to the enemy
         self.hit = r.randrange(1,21) + self.baseDamage
         print(" ")
         print("You rolled: " + str(self.hit))
@@ -38,20 +40,20 @@ class Player(pygame.sprite.Sprite):
             mantaRay.health = mantaRay.health - playerDamage
             print("You dealt: " + str(playerDamage))
 
-    def update(self):
-        if self.health <= 0:
+    def update(self): #Continously checking the sprite and their variables the entire time the game is active
+        if self.health <= 0: #Checks their Health
             if self.Alive == True:
                 print("You died!")
                 self.Alive = False
         
-        if self.goDown == True:
+        if self.goDown == True: #Sprite moves down
             self.rect.y += 1
             self.rect.x += 1
             if self.rect.y >= 170:
                 self.goUp = True
                 self.goDown = False
 
-        if self.goUp == True:
+        if self.goUp == True: #Sprite begins moving up
             self.rect.y -= 1
             self.rect.x -= 1
             if self.rect.y <= 150:
@@ -67,6 +69,14 @@ class Enemy(pygame.sprite.Sprite):
         self.Alive = True
         self.armor = defense
         self.maxDmg = maxDmg
+        self.image = pygame.image.load("C:\\Users\\pureb\\Documents\\Some_python\\Ocean Blues\\Turtle.team\\assets\\sprites\\stingray_defaultA.png")
+        self.image = pygame.transform.flip(self.image, True, False)
+        self.rect = self.image.get_rect()
+        self.rect.center = [pos_x, pos_y]
+
+        self.goDown = False
+        self.goUp = True
+
         self.hit = 0
     
     def attack(self):
@@ -83,7 +93,17 @@ class Enemy(pygame.sprite.Sprite):
             if self.Alive == True:
                 print("You killed the enemy!")
                 self.Alive = False
+        if self.goDown == True:
+            self.rect.y += 1
+            if self.rect.y >= 170:
+                self.goDown = False
+                self.goUp = True
         
+        if self.goUp == True:
+            self.rect.y -= 1
+            if self.rect.y <= 140:
+                self.goDown = True
+                self.goUp = False
 
 
 
@@ -91,7 +111,7 @@ merek = Player(480,180)
 player_group = pygame.sprite.Group()
 player_group.add(merek)
 
-mantaRay = Enemy(0,0, 20, 10, 2, 7)
+mantaRay = Enemy(120,180, 20, 10, 2, 7)
 enemy_group = pygame.sprite.Group()
 enemy_group.add(mantaRay)
 
@@ -111,6 +131,7 @@ while True:
 
     pygame.display.flip()
     player_group.draw(screen)
+    enemy_group.draw(screen)
     player_group.update()
     enemy_group.update()
-    clock.tick(30)
+    clock.tick(20)
