@@ -22,6 +22,9 @@ enemyDamage = 0
 remainingCharges1 = 0
 remainingCharges2 = 0
 remainingCharges3 = 0
+enemyApproaches = pygame.mixer.Sound("assets\\music\\encounter_1\\approach.wav")
+enemyBattle = pygame.mixer.Sound("assets\\music\\encounter_1\\Battle.wav")
+enemyEncounter = pygame.mixer.Sound("assets\\music\\encounter_1\\encounter.wav")
 
 
 
@@ -109,7 +112,7 @@ class Enemy(pygame.sprite.Sprite):
         self.goUp = True
 
         self.hit = 0
-    
+
     def attack(self):
         global enemyDamage
         self.attackTime = True
@@ -247,88 +250,93 @@ enemy_group = pygame.sprite.Group()
 enemy_group.add(mantaRay)
 
 
+def EncounterOne():
+    global menu, remainingCharges1, remainingCharges2, remainingCharges3,currentLeftArrow, currentRightArrow
+    enemyBattle.play()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    if arrow.inMagicMenu == True:
+                        if currentRightArrow == selectedRightArrow:
+                            if menu in arrow.magicMenu2:
+                                menu = arrow.magicMenus[2][remainingCharges3]
+                            if menu in arrow.magicMenu1:
+                                menu = arrow.magicMenus[1][remainingCharges2]
+                        if currentLeftArrow == selectedLeftArrow:
+                            if menu in arrow.magicMenu2:
+                                menu = arrow.magicMenus[0][remainingCharges1]
+                            if menu in arrow.magicMenu3:
+                                menu = arrow.magicMenus[1][remainingCharges2]
+                        if currentLeftArrow == leftArrow and currentRightArrow == rightArrow:
+                            if menu in arrow.magicMenu1:
+                                remainingCharges1 += 1
+                                menu = arrow.magicMenus[0][remainingCharges1]
+                            if menu in arrow.magicMenu2:
+                                remainingCharges2 += 1
+                                menu = arrow.magicMenus[1][remainingCharges2]
+                            if menu in arrow.magicMenu3:
+                                remainingCharges3 += 1
+                                menu = arrow.magicMenus[2][remainingCharges3]
 
-while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_RETURN:
-                if arrow.inMagicMenu == True:
-                    if currentRightArrow == selectedRightArrow:
-                        if menu in arrow.magicMenu2:
-                            menu = arrow.magicMenus[2][remainingCharges3]
-                        if menu in arrow.magicMenu1:
-                            menu = arrow.magicMenus[1][remainingCharges2]
-                    if currentLeftArrow == selectedLeftArrow:
-                        if menu in arrow.magicMenu2:
-                            menu = arrow.magicMenus[0][remainingCharges1]
-                        if menu in arrow.magicMenu3:
-                            menu = arrow.magicMenus[1][remainingCharges2]
-                    if currentLeftArrow == leftArrow and currentRightArrow == rightArrow:
-                        if menu in arrow.magicMenu1:
-                            remainingCharges1 += 1
-                            menu = arrow.magicMenus[0][remainingCharges1]
-                        if menu in arrow.magicMenu2:
-                            remainingCharges2 += 1
-                            menu = arrow.magicMenus[1][remainingCharges2]
-                        if menu in arrow.magicMenu3:
-                            remainingCharges3 += 1
-                            menu = arrow.magicMenus[2][remainingCharges3]
 
-
-                if arrow.inMagicMenu == False:
-                    if arrow.rightness == 1:
-                        if merek.defending == True:
-                            merek.armor -= 5
-                            print(' ')
-                            print("Your guard dropped!")
-                            merek.defending = False
-                        if mantaRay.health > 0:
-                            if merek.health > 0:
+                    if arrow.inMagicMenu == False:
+                        if arrow.rightness == 1:
+                            if merek.defending == True:
+                                merek.armor -= 5
+                                print(' ')
+                                print("Your guard dropped!")
+                                merek.defending = False
+                            if mantaRay.health > 0:
                                 if merek.health > 0:
-                                    merek.attack()
-                                if mantaRay.health > 0:
-                                    mantaRay.attack()
-                    if arrow.rightness == 2:
-                        merek.defend()
-                        print(' ')
-                        print("Your guard is up!")
-                        merek.health += 2
-                        if mantaRay.health > 0:
-                            if merek.health > 0:
-                                    mantaRay.attack()
-                    if arrow.rightness == 3:
-                        menu = arrow.magicMenus[0][remainingCharges1]
-                        arrow.inMagicMenu = True
-                        arrow.rightness = 5
+                                    if merek.health > 0:
+                                        merek.attack()
+                                    if mantaRay.health > 0:
+                                        mantaRay.attack()
+                        if arrow.rightness == 2:
+                            merek.defend()
+                            print(' ')
+                            print("Your guard is up!")
+                            merek.health += 2
+                            if mantaRay.health > 0:
+                                if merek.health > 0:
+                                        mantaRay.attack()
+                        if arrow.rightness == 3:
+                            menu = arrow.magicMenus[0][remainingCharges1]
+                            arrow.inMagicMenu = True
+                            arrow.rightness = 5
 
-            if event.key == pygame.K_RIGHT:
-                arrow.move_right()
-            if event.key == pygame.K_LEFT:
-                if arrow.inMagicMenu == False:
-                    arrow.move_left()
-                if arrow.inMagicMenu == True:
-                    currentLeftArrow = leftArrow
+                if event.key == pygame.K_RIGHT:
+                    arrow.move_right()
+                if event.key == pygame.K_LEFT:
+                    if arrow.inMagicMenu == False:
+                        arrow.move_left()
+                    if arrow.inMagicMenu == True:
+                        currentLeftArrow = leftArrow
+                        currentRightArrow = rightArrow
+                if event.key == pygame.K_DOWN:
+                    currentLeftArrow = selectedLeftArrow
                     currentRightArrow = rightArrow
-            if event.key == pygame.K_DOWN:
-                currentLeftArrow = selectedLeftArrow
-                currentRightArrow = rightArrow
-            if event.key == pygame.K_UP:
-                currentRightArrow = selectedRightArrow
-                currentLeftArrow = leftArrow
+                if event.key == pygame.K_UP:
+                    currentRightArrow = selectedRightArrow
+                    currentLeftArrow = leftArrow
 
 
-    pygame.display.flip()
-    screen.blit(background, (0,0))
-    screen.blit(menu, (85,120))
-    if arrow.inMagicMenu == True:
-        screen.blit(currentRightArrow, (362, 178))
-        screen.blit(currentLeftArrow, (521, 208))
-    player_group.draw(screen)
-    enemy_group.draw(screen)
-    menu_assets.draw(screen)
-    player_group.update()
-    enemy_group.update()
-    menu_assets.update()
-    clock.tick(20)
+        pygame.display.flip()
+        screen.blit(background, (0,0))
+        screen.blit(menu, (85,120))
+        if arrow.inMagicMenu == True:
+            screen.blit(currentRightArrow, (362, 178))
+            screen.blit(currentLeftArrow, (521, 208))
+        player_group.draw(screen)
+        enemy_group.draw(screen)
+        menu_assets.draw(screen)
+        player_group.update()
+        enemy_group.update()
+        menu_assets.update()
+        clock.tick(20)
+
+
+EncounterOne()
