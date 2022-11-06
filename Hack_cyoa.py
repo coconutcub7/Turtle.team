@@ -15,6 +15,8 @@ selectedRightArrow = pygame.transform.scale(pygame.image.load("assets\\sprites\\
 currentRightArrow = rightArrow
 currentLeftArrow = leftArrow
 
+vampireMusic = pygame.mixer.Sound("assets\\music\\encounter 3\\squid_battle.wav")
+
 finalBossMusic = pygame.mixer.Sound("assets\\music\\organ\\organ_mixdown.wav")
 
 lightning1 = pygame.image.load("assets\\sprites\\lightning_assetA.png")
@@ -634,8 +636,33 @@ class Magic(pygame.sprite.Sprite):
             mejik.kill()
 
         
-
-
+def choicesOne():
+    print("The radio begins to buzz.")
+    print("1. Answer")
+      #explaination of lifesteal and where it may be useful
+    print("2. Ignore") 
+      #less chance of beating the game (skips right to post-stingray magic collection)
+     #post-stingray magic collection
+    #1. collect stingray magic 
+      #-> +2 mag, -1 ac
+    #2. don't touch magic
+ #- signal from team: dive deeper (effectively an explore round, you gain +1 lifesteal xp) 
+    #1. where?
+      #-> to the magma trenches. your reads indicate something promising in that direction
+    answerOne = int(input('Choose 1 or 2: '))
+    if answerOne == 1:
+        print('Captain: "Afternoon Merek. We are radioing you to ask you if you encountered any strange red jewels."')
+        print('"No... Why?')
+        print('Captain: "Its because some of those red jewels can grant a potent magic, known as lifesteal."')
+        print('"Lifsteal?"')
+        print('Captain: "Precisely. It would be useful to collect them and bring them back to base. Or should you be in danger..."')
+        print('Captain:"You could use them to save yer lifee."')
+        input(' ')
+        print('"Ill be sure to keep that in mind. Ill be returning to the mission then."')
+        print('Captain: "Good luck."')
+        print('You put the radio away, swimming deeper in the ocean. Before you encounter a strange stingray.')
+    else:
+        print('You put the radio away instead. Focusing on the task ahead first.')
 
 
 merek = Player(480,130)
@@ -697,7 +724,7 @@ def SceneOne():
             
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
-                    #Insert the story/plot as functions under this line of code
+                    choicesOne()
                     EncounterOne()
         
         pygame.display.flip()
@@ -1003,7 +1030,7 @@ def EncounterThree():
     global menu, remainingCharges1, remainingCharges2, remainingCharges3,currentLeftArrow, currentRightArrow
     screen = pygame.display.set_mode((640,360))
     clock = pygame.time.Clock()
-    playmusic.play(enemyBattle, -1)
+    playmusic.play(vampireMusic, -1)
     enemy_group.add(vampiir)
     background = pygame.image.load("assets\\backgrounds\\background_encounter3.png")
 
