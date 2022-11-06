@@ -1,12 +1,15 @@
 import random as r
 import pygame
 from math import floor
+import turtle as t
 
 pygame.init()
 screen = pygame.display.set_mode((640,360))
 clock = pygame.time.Clock()
 background = pygame.image.load("assets\\astur\\real_real.jpg")
 background = pygame.transform.scale(background, (640, 360))
+menu = pygame.image.load("assets\\sprites\\menu_defaultA.png")
+menu = pygame.transform.scale(menu, (464, 240))
 
 
 #Variables to keep a global track of damage throughout game
@@ -53,14 +56,14 @@ class Player(pygame.sprite.Sprite):
         if self.goDown == True: #Sprite moves down
             self.rect.y += 1
             self.rect.x += 1
-            if self.rect.y >= 170:
+            if self.rect.y >= 120:
                 self.goUp = True
                 self.goDown = False
 
         if self.goUp == True: #Sprite begins moving up
             self.rect.y -= 1
             self.rect.x -= 1
-            if self.rect.y <= 150:
+            if self.rect.y <= 100:
                 self.goUp = False
                 self.goDown = True
             
@@ -107,7 +110,6 @@ class Enemy(pygame.sprite.Sprite):
             merek.health = merek.health - enemyDamage
             print("The enemy dealt: " + str(enemyDamage))
     def update(self):
-        print(self.currentimage)
         if self.health <= 0:
             if self.Alive == True:
                 print("You killed the enemy!")
@@ -116,7 +118,7 @@ class Enemy(pygame.sprite.Sprite):
             if self.attackTime == True:
                 self.currentimage += 0.1
                 self.image = self.listimage[int(self.currentimage)]
-                if self.currentimage >= 4:
+                if self.currentimage >= 3.5:
                     self.attackTime = False
             if self.attackTime == False:
                 self.currentimage -= 0.1
@@ -127,13 +129,13 @@ class Enemy(pygame.sprite.Sprite):
 
         if self.goDown == True:
             self.rect.y += 1
-            if self.rect.y >= 170:
+            if self.rect.y >= 120:
                 self.goDown = False
                 self.goUp = True
         
         if self.goUp == True:
             self.rect.y -= 1
-            if self.rect.y <= 140:
+            if self.rect.y <= 90:
                 self.goDown = True
                 self.goUp = False
 
@@ -144,11 +146,11 @@ class Enemy(pygame.sprite.Sprite):
 
 
 
-merek = Player(480,180)
+merek = Player(480,130)
 player_group = pygame.sprite.Group()
 player_group.add(merek)
 
-mantaRay = Enemy(120,180, 50, 10, 2, 7)
+mantaRay = Enemy(120,130, 50, 10, 2, 7)
 enemy_group = pygame.sprite.Group()
 enemy_group.add(mantaRay)
 
@@ -169,6 +171,7 @@ while True:
 
     pygame.display.flip()
     screen.blit(background, (0,0))
+    screen.blit(menu, (85,120))
     player_group.draw(screen)
     enemy_group.draw(screen)
     player_group.update()
