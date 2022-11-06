@@ -1,7 +1,6 @@
 import random as r
 import pygame
 from math import floor
-import turtle as t
 
 pygame.init()
 screen = pygame.display.set_mode((640,360))
@@ -29,6 +28,7 @@ class Player(pygame.sprite.Sprite):
         self.hit = 0
         self.goDown = True
         self.goUp = False
+        self.defending = False
 
 
         self.image = pygame.image.load("C:\\Users\\pureb\\Documents\\Some_python\\Ocean Blues\\Turtle.team\\assets\\astur\\merik_defaultA.png")
@@ -46,6 +46,10 @@ class Player(pygame.sprite.Sprite):
             playerDamage = (r.randrange(1,7)) + self.baseDamage
             mantaRay.health = mantaRay.health - playerDamage
             print("You dealt: " + str(playerDamage))
+
+    def defend(self):
+        self.armor += 5
+        self.defending = True
 
     def update(self): #Continously checking the sprite and their variables the entire time the game is active
         if self.health <= 0: #Checks their Health
@@ -65,8 +69,7 @@ class Player(pygame.sprite.Sprite):
             self.rect.x -= 1
             if self.rect.y <= 100:
                 self.goUp = False
-                self.goDown = True
-            
+                self.goDown = True     
         
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y, hp, defense, attack, maxDmg):
@@ -144,13 +147,50 @@ class Enemy(pygame.sprite.Sprite):
                 self.image = self.listimage[1]
                 self.wizardMan = True
 
+class Arrow(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__()
+        self.image = pygame.image.load("assets\\sprites\\arrow.png")
+        self.image = pygame.transform.scale(self.image, (105, 95))
+        self.rect = self.image.get_rect()
+        self.rect.center = [pos_x, pos_y]
+        self.goDown = False
+        self.goUp = True
+        self.rightness = 1
+
+    def move_right(self):
+        if self.rightness < 3:
+            self.rect.x += 145
+            self.rightness += 1
+    def move_left(self):
+        if self.rightness > 1:
+            self.rect.x -= 145
+            self.rightness -= 1
+
+    def update(self):
+        if self.goDown == True:
+            self.rect.y += 1
+            if self.rect.y >= 225:
+                self.goDown = False
+                self.goUp = True
+        
+        if self.goUp == True:
+            self.rect.y -= 1
+            if self.rect.y <= 215:
+                self.goDown = True
+                self.goUp = False
+
 
 
 merek = Player(480,130)
 player_group = pygame.sprite.Group()
 player_group.add(merek)
 
-mantaRay = Enemy(120,130, 50, 10, 2, 7)
+arrow = Arrow(165, 270)
+menu_assets = pygame.sprite.Group()
+menu_assets.add(arrow)
+
+mantaRay = Enemy(140,130, 50, 10, 2, 7)
 enemy_group = pygame.sprite.Group()
 enemy_group.add(mantaRay)
 
@@ -161,19 +201,39 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                if mantaRay.health > 0:
-                    if merek.health > 0:
+            if event.key == pygame.K_RETURN:
+                if arrow.rightness == 1:
+                    if merek.defending == True:
+                        merek.armor -= 5
+                        print(' ')
+                        print("Your guard dropped!")
+                        merek.defending = False
+                    if mantaRay.health > 0:
                         if merek.health > 0:
-                            merek.attack()
-                        if mantaRay.health > 0:
-                            mantaRay.attack()
+                            if merek.health > 0:
+                                merek.attack()
+                            if mantaRay.health > 0:
+                                mantaRay.attack()
+                if arrow.rightness == 2:
+                    merek.defend()
+                    print(' ')
+                    print("Your guard is up!")
+                    merek.health += 2
+                    if mantaRay.health > 0:
+                        if merek.health > 0:
+                                mantaRay.attack()
+            if event.key == pygame.K_RIGHT:
+                arrow.move_right()
+            if event.key == pygame.K_LEFT:
+                arrow.move_left()
 
     pygame.display.flip()
     screen.blit(background, (0,0))
     screen.blit(menu, (85,120))
     player_group.draw(screen)
     enemy_group.draw(screen)
+    menu_assets.draw(screen)
     player_group.update()
     enemy_group.update()
+    menu_assets.update()
     clock.tick(20)
