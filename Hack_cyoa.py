@@ -15,6 +15,8 @@ selectedRightArrow = pygame.transform.scale(pygame.image.load("assets\\sprites\\
 currentRightArrow = rightArrow
 currentLeftArrow = leftArrow
 
+finalBossMusic = pygame.mixer.Sound("assets\\music\\organ\\organ_mixdown.wav")
+
 lightning1 = pygame.image.load("assets\\sprites\\lightning_assetA.png")
 lightning2 = pygame.image.load("assets\\sprites\\lightning_assetB.png")
 lightning3 = pygame.image.load("assets\\sprites\\lightning_assetC.png")
@@ -145,6 +147,7 @@ class MantaRay(pygame.sprite.Sprite):
             enemyDamage = (r.randrange(1,self.maxDmg) + self.baseDamage)
             merek.health = merek.health - enemyDamage
             print("The enemy dealt: " + str(enemyDamage))
+            print("You have " + str(merek.health) + " HP left!")
     def update(self):
         if self.health <= 0:
             if self.Alive == True:
@@ -318,6 +321,7 @@ class dragonFish(pygame.sprite.Sprite):
             enemyDamage = (r.randrange(1,self.maxDmg) + self.baseDamage)
             merek.health = merek.health - enemyDamage
             print("The enemy dealt: " + str(enemyDamage))
+            print("You have " + str(merek.health) + " HP left!")
     def update(self):
         if self.health <= 0:
             if self.Alive == True:
@@ -384,6 +388,7 @@ class vampire(pygame.sprite.Sprite):
             enemyDamage = (r.randrange(1,self.maxDmg) + self.baseDamage)
             merek.health = merek.health - enemyDamage
             print("The enemy dealt: " + str(enemyDamage))
+            print("You have " + str(merek.health) + " HP left!")
     def update(self):
         if self.health <= 0:
             if self.Alive == True:
@@ -454,6 +459,7 @@ class anglerFish(pygame.sprite.Sprite):
             enemyDamage = (r.randrange(1,self.maxDmg) + self.baseDamage)
             merek.health = merek.health - enemyDamage
             print("The enemy dealt: " + str(enemyDamage))
+            print("You have " + str(merek.health) + " HP left!")
     def update(self):
         if self.health <= 0:
             if self.Alive == True:
@@ -522,6 +528,7 @@ class Leviathin(pygame.sprite.Sprite):
             enemyDamage = (r.randrange(1,self.maxDmg) + self.baseDamage)
             merek.health = merek.health - enemyDamage
             print("The enemy dealt: " + str(enemyDamage))
+            print("You have " + str(merek.health) + " HP left!")
     def update(self):
         if self.health <= 0:
             if self.Alive == True:
@@ -564,6 +571,7 @@ class Magic(pygame.sprite.Sprite):
         self.image = imgOne
         self.rect = self.image.get_rect()
         self.rect.center = [pos_x, pos_y]
+        self.wait = 0
 
 
         self.magicList = []
@@ -572,12 +580,19 @@ class Magic(pygame.sprite.Sprite):
         self.magicList.append(imgThree)
 
     def healing(self):
+        special_effects.add(mejik)
         merek.health += self.heal
-        self.image = self.magicList[1]
+        self.wait = 0
+        print("Healed " + str(self.heal) + " HP!")
+        self.image = self.magicList[0]
         self.rect.x = 480
         self.rect.y = 130
     def damage(self):
+        special_effects.add(mejik)
+        self.wait = 0
         print("You cast arcane bolt!")
+        self.image = self.magicList[1]
+        self.rect.x = 140
         if mantaRay in enemy_group:
             playerDamage = (r.randrange(5,11)) + self.baseDamage
             mantaRay.health = mantaRay.health - playerDamage
@@ -599,7 +614,11 @@ class Magic(pygame.sprite.Sprite):
             final.health = final.health - playerDamage
             print("Arcane bolt dealt " + str(playerDamage) + " Damage!")
     def daze(self):
+        special_effects.add(mejik)
+        self.wait = 0
         if self.castedDaze == False:
+            self.image = self.magicList [2]
+            self.rect.x = 140
             print("You daze the enemy! You are able to evade their attack more easily for 3 turns.")
             self.turnCount = 1
             merek.armor += 4
@@ -609,6 +628,10 @@ class Magic(pygame.sprite.Sprite):
         if self.turnCount == 3:
             print("Daze ran off the enemy!")
             merek.armor -= 4
+        if self.wait <=20:
+            self.wait += 1
+        else:
+            mejik.kill()
 
         
 
@@ -785,14 +808,28 @@ def EncounterOne():
                                 menu = arrow.magicMenus[1][remainingCharges2]
                         if currentLeftArrow == leftArrow and currentRightArrow == rightArrow:
                             if menu in arrow.magicMenu1:
-                                remainingCharges1 += 1
-                                menu = arrow.magicMenus[0][remainingCharges1]
+                                if remainingCharges1 != 4:
+                                    remainingCharges1 += 1
+                                    menu = arrow.magicMenus[0][remainingCharges1]
+                                    mejik.healing()
+                                else:
+                                    print("Out of magic!")
                             if menu in arrow.magicMenu2:
-                                remainingCharges2 += 1
-                                menu = arrow.magicMenus[1][remainingCharges2]
+                                if remainingCharges2 != 4:
+                                    remainingCharges2 += 1
+                                    menu = arrow.magicMenus[1][remainingCharges2]
+                                    mejik.damage()
+                                else:
+                                    print("Out of magic!")
                             if menu in arrow.magicMenu3:
-                                remainingCharges3 += 1
-                                menu = arrow.magicMenus[2][remainingCharges3]
+                                if remainingCharges3 != 4:
+                                    remainingCharges3 += 1
+                                    menu = arrow.magicMenus[2][remainingCharges3]
+                                    mejik.daze()
+                                else:
+                                    print("Out of magic!")
+
+                                
 
 
                     if arrow.inMagicMenu == False:
@@ -857,7 +894,7 @@ def EncounterTwo():
     global menu, remainingCharges1, remainingCharges2, remainingCharges3,currentLeftArrow, currentRightArrow
     screen = pygame.display.set_mode((640,360))
     clock = pygame.time.Clock()
-    playmusic.play(enemyBattle)
+    playmusic.play(enemyBattle, -1)
     enemy_group.add(dragon_fish)
     background = pygame.image.load("assets\\backgrounds\\background_encounter2.png")
 
@@ -884,14 +921,26 @@ def EncounterTwo():
                                 menu = arrow.magicMenus[1][remainingCharges2]
                         if currentLeftArrow == leftArrow and currentRightArrow == rightArrow:
                             if menu in arrow.magicMenu1:
-                                remainingCharges1 += 1
-                                menu = arrow.magicMenus[0][remainingCharges1]
+                                if remainingCharges1 != 4:
+                                    remainingCharges1 += 1
+                                    menu = arrow.magicMenus[0][remainingCharges1]
+                                    mejik.healing()
+                                else:
+                                    print("Out of magic!")
                             if menu in arrow.magicMenu2:
-                                remainingCharges2 += 1
-                                menu = arrow.magicMenus[1][remainingCharges2]
+                                if remainingCharges2 != 4:
+                                    remainingCharges2 += 1
+                                    menu = arrow.magicMenus[1][remainingCharges2]
+                                    mejik.damage()
+                                else:
+                                    print("Out of magic!")
                             if menu in arrow.magicMenu3:
-                                remainingCharges3 += 1
-                                menu = arrow.magicMenus[2][remainingCharges3]
+                                if remainingCharges3 != 4:
+                                    remainingCharges3 += 1
+                                    menu = arrow.magicMenus[2][remainingCharges3]
+                                    mejik.daze()
+                                else:
+                                    print("Out of magic!")
 
 
                     if arrow.inMagicMenu == False:
@@ -954,7 +1003,7 @@ def EncounterThree():
     global menu, remainingCharges1, remainingCharges2, remainingCharges3,currentLeftArrow, currentRightArrow
     screen = pygame.display.set_mode((640,360))
     clock = pygame.time.Clock()
-    playmusic.play(enemyBattle)
+    playmusic.play(enemyBattle, -1)
     enemy_group.add(vampiir)
     background = pygame.image.load("assets\\backgrounds\\background_encounter3.png")
 
@@ -981,14 +1030,26 @@ def EncounterThree():
                                 menu = arrow.magicMenus[1][remainingCharges2]
                         if currentLeftArrow == leftArrow and currentRightArrow == rightArrow:
                             if menu in arrow.magicMenu1:
-                                remainingCharges1 += 1
-                                menu = arrow.magicMenus[0][remainingCharges1]
+                                if remainingCharges1 != 4:
+                                    remainingCharges1 += 1
+                                    menu = arrow.magicMenus[0][remainingCharges1]
+                                    mejik.healing()
+                                else:
+                                    print("Out of magic!")
                             if menu in arrow.magicMenu2:
-                                remainingCharges2 += 1
-                                menu = arrow.magicMenus[1][remainingCharges2]
+                                if remainingCharges2 != 4:
+                                    remainingCharges2 += 1
+                                    menu = arrow.magicMenus[1][remainingCharges2]
+                                    mejik.damage()
+                                else:
+                                    print("Out of magic!")
                             if menu in arrow.magicMenu3:
-                                remainingCharges3 += 1
-                                menu = arrow.magicMenus[2][remainingCharges3]
+                                if remainingCharges3 != 4:
+                                    remainingCharges3 += 1
+                                    menu = arrow.magicMenus[2][remainingCharges3]
+                                    mejik.daze()
+                                else:
+                                    print("Out of magic!")
 
 
                     if arrow.inMagicMenu == False:
@@ -1051,7 +1112,7 @@ def EncounterFour():
     global menu, remainingCharges1, remainingCharges2, remainingCharges3,currentLeftArrow, currentRightArrow
     screen = pygame.display.set_mode((640,360))
     clock = pygame.time.Clock()
-    playmusic.play(enemyBattle)
+    playmusic.play(enemyBattle, -1)
     enemy_group.add(angler_fish)
     background = pygame.image.load("assets\\backgrounds\\background_encounter4.png")
 
@@ -1077,20 +1138,27 @@ def EncounterFour():
                             if menu in arrow.magicMenu3:
                                 menu = arrow.magicMenus[1][remainingCharges2]
                         if currentLeftArrow == leftArrow and currentRightArrow == rightArrow:
-                            if remainingCharges1 != 4:
-                                if menu in arrow.magicMenu1:
+                            if menu in arrow.magicMenu1:
+                                if remainingCharges1 != 4:
                                     remainingCharges1 += 1
                                     menu = arrow.magicMenus[0][remainingCharges1]
-                            elif remainingCharges2 != 4:
-                                if menu in arrow.magicMenu2:
+                                    mejik.healing()
+                                else:
+                                    print("Out of magic!")
+                            if menu in arrow.magicMenu2:
+                                if remainingCharges2 != 4:
                                     remainingCharges2 += 1
                                     menu = arrow.magicMenus[1][remainingCharges2]
-                            elif remainingCharges3 != 4:
-                                if menu in arrow.magicMenu3:
+                                    mejik.damage()
+                                else:
+                                    print("Out of magic!")
+                            if menu in arrow.magicMenu3:
+                                if remainingCharges3 != 4:
                                     remainingCharges3 += 1
                                     menu = arrow.magicMenus[2][remainingCharges3]
-                            else:
-                                print("Out of magic!")
+                                    mejik.daze()
+                                else:
+                                    print("Out of magic!")
 
                     if arrow.inMagicMenu == False:
                         if arrow.rightness == 1:
@@ -1152,7 +1220,7 @@ def EncounterFive():
     global menu, remainingCharges1, remainingCharges2, remainingCharges3,currentLeftArrow, currentRightArrow
     screen = pygame.display.set_mode((640,360))
     clock = pygame.time.Clock()
-    playmusic.play(enemyBattle)
+    playmusic.play(finalBossMusic, -1)
     enemy_group.add(final)
     background = pygame.image.load("assets\\backgrounds\\background_encounter5.png")
 
@@ -1178,18 +1246,27 @@ def EncounterFive():
                             if menu in arrow.magicMenu3:
                                 menu = arrow.magicMenus[1][remainingCharges2]
                         if currentLeftArrow == leftArrow and currentRightArrow == rightArrow:
-                            if remainingCharges1 != 4:
-                                if menu in arrow.magicMenu1:
+                            if menu in arrow.magicMenu1:
+                                if remainingCharges1 != 4:
                                     remainingCharges1 += 1
                                     menu = arrow.magicMenus[0][remainingCharges1]
-                            if remainingCharges2 != 4:
-                                if menu in arrow.magicMenu2:
+                                    mejik.healing()
+                                else:
+                                    print("Out of magic!")
+                            if menu in arrow.magicMenu2:
+                                if remainingCharges2 != 4:
                                     remainingCharges2 += 1
                                     menu = arrow.magicMenus[1][remainingCharges2]
-                            if remainingCharges3 != 4:
-                                if menu in arrow.magicMenu3:
+                                    mejik.damage()
+                                else:
+                                    print("Out of magic!")
+                            if menu in arrow.magicMenu3:
+                                if remainingCharges3 != 4:
                                     remainingCharges3 += 1
                                     menu = arrow.magicMenus[2][remainingCharges3]
+                                    mejik.daze()
+                                else:
+                                    print("Out of magic!")
 
 
                     if arrow.inMagicMenu == False:
