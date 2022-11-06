@@ -1,5 +1,6 @@
 import random as r
 import pygame
+from math import floor
 
 pygame.init()
 screen = pygame.display.set_mode((640,360))
@@ -70,12 +71,25 @@ class Enemy(pygame.sprite.Sprite):
         self.health = hp
         self.baseDamage = attack
         self.Alive = True
+        self.attackTime = None
         self.armor = defense
         self.maxDmg = maxDmg
-        self.image = pygame.image.load("C:\\Users\\pureb\\Documents\\Some_python\\Ocean Blues\\Turtle.team\\assets\\sprites\\stingray_defaultA.png")
-        self.image = pygame.transform.flip(self.image, True, False)
+        self.wizardMan = False
+
+        imgOne = pygame.image.load("C:\\Users\\pureb\\Documents\\Some_python\\Ocean Blues\\Turtle.team\\assets\\sprites\\stingray_defaultA.png")
+        imgOne = pygame.transform.flip(imgOne, True, False)
+        self.image = imgOne
         self.rect = self.image.get_rect()
         self.rect.center = [pos_x, pos_y]
+        imgTwo = pygame.transform.flip(pygame.image.load("C:\\Users\\pureb\\Documents\\Some_python\\Ocean Blues\\Turtle.team\\assets\\sprites\\stingray_WizardA.png"), True, False)
+        imgThree = pygame.image.load("C:\\Users\\pureb\\Documents\\Some_python\\Ocean Blues\\Turtle.team\\assets\\sprites\\stingray_WizardB.png")
+        imgFour = pygame.image.load("C:\\Users\\pureb\\Documents\\Some_python\\Ocean Blues\\Turtle.team\\assets\\sprites\\stingray_WizardC.png")
+        self.listimage = []
+        self.listimage.append(imgOne)
+        self.listimage.append(imgTwo)
+        self.listimage.append(pygame.transform.flip(imgThree, True, False))
+        self.listimage.append(pygame.transform.flip(imgFour, True, False))
+        self.currentimage = 1
 
         self.goDown = False
         self.goUp = True
@@ -84,6 +98,7 @@ class Enemy(pygame.sprite.Sprite):
     
     def attack(self):
         global enemyDamage
+        self.attackTime = True
         self.hit = r.randrange(1,21) + self.baseDamage
         print(" ")
         print("The enemy rolled: " + str(self.hit))
@@ -92,10 +107,24 @@ class Enemy(pygame.sprite.Sprite):
             merek.health = merek.health - enemyDamage
             print("The enemy dealt: " + str(enemyDamage))
     def update(self):
+        print(self.currentimage)
         if self.health <= 0:
             if self.Alive == True:
                 print("You killed the enemy!")
                 self.Alive = False
+        if self.wizardMan == True:
+            if self.attackTime == True:
+                self.currentimage += 0.1
+                self.image = self.listimage[int(self.currentimage)]
+                if self.currentimage >= 4:
+                    self.attackTime = False
+            if self.attackTime == False:
+                self.currentimage -= 0.1
+                self.image = self.listimage[int(self.currentimage)]
+                if self.currentimage <= 1:
+                    self.attackTime = None
+
+
         if self.goDown == True:
             self.rect.y += 1
             if self.rect.y >= 170:
@@ -108,8 +137,10 @@ class Enemy(pygame.sprite.Sprite):
                 self.goDown = True
                 self.goUp = False
 
-        if self.health <= 10:
-            self.image = pygame.transform.flip(pygame.image.load("C:\\Users\\pureb\\Documents\\Some_python\\Ocean Blues\\Turtle.team\\assets\\sprites\\stingray_WizardA.png"), True, False)
+        if self.wizardMan == False:
+            if self.health <= 40:
+                self.image = self.listimage[1]
+                self.wizardMan = True
 
 
 
@@ -117,7 +148,7 @@ merek = Player(480,180)
 player_group = pygame.sprite.Group()
 player_group.add(merek)
 
-mantaRay = Enemy(120,180, 20, 10, 2, 7)
+mantaRay = Enemy(120,180, 50, 10, 2, 7)
 enemy_group = pygame.sprite.Group()
 enemy_group.add(mantaRay)
 
