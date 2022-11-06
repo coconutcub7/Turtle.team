@@ -4,10 +4,10 @@ from math import floor
 
 pygame.init()
 playmusic = pygame.mixer.Channel(1)
-background = pygame.image.load("assets\\astur\\real_real.jpg")
-background = pygame.transform.scale(background, (640, 360))
+background = pygame.image.load("assets\\backgrounds\\background_encounter1.png")
 menu = pygame.image.load("assets\\sprites\\menu_defaultA.png")
 menu = pygame.transform.scale(menu, (464, 240))
+normalMenu = menu
 leftArrow = pygame.transform.scale(pygame.image.load("assets\\sprites\\menu_magic_leftarrow1.png"), (367, 204))
 rightArrow = pygame.transform.scale(pygame.image.load("assets\sprites\menu_magic_rightarrow1.png"), (367, 204))
 selectedLeftArrow = pygame.transform.scale(pygame.image.load("assets\\sprites\\menu_magic_leftarrow0.png"), (367, 204))
@@ -65,10 +65,18 @@ class Player(pygame.sprite.Sprite):
             if self.hit >= dragon_fish.armor:
                 playerDamage = (r.randrange(1,7)) + self.baseDamage
                 dragon_fish.health = dragon_fish.health - playerDamage
+        if vampiir in enemy_group:
+            if self.hit >= vampiir.armor:
+                playerDamage = (r.randrange(1,7)) + self.baseDamage
+                vampiir.health = vampiir.health - playerDamage
         if angler_fish in enemy_group:
             if self.hit >= dragon_fish.armor:
                 playerDamage = (r.randrange(1,7)) + self.baseDamage
                 angler_fish.health = angler_fish.health - playerDamage
+        if final in enemy_group:
+            if self.hit >= final.armor:
+                playerDamage = (r.randrange(1,7)) + self.baseDamage
+                final.health = final.health - playerDamage
             print("You dealt: " + str(playerDamage))
 
     def defend(self):
@@ -241,6 +249,7 @@ class Arrow(pygame.sprite.Sprite):
         self.magicMenus.append(self.magicMenu1)
         self.magicMenus.append(self.magicMenu2)
         self.magicMenus.append(self.magicMenu3)
+        self.defaultMenu = normalMenu
 
 
     def move_right(self):
@@ -349,8 +358,8 @@ class vampire(pygame.sprite.Sprite):
         self.armor = defense
         self.maxDmg = maxDmg
 
-        imgOne = pygame.transform.scale2x(pygame.image.load("assets\sprites\vampiresquid_defaultA.png"))
-        imgTwo = pygame.transform.scale2x(pygame.image.load("assets\sprites\vampiresquid_defaultB.png"))
+        imgOne = pygame.transform.scale2x(pygame.image.load("assets\\sprites\\vampiresquid_defaultA.png"))
+        imgTwo = pygame.transform.scale2x(pygame.image.load("assets\\sprites\\vampiresquid_defaultB.png"))
         self.image = pygame.transform.flip(imgOne, True, False)
         self.rect = self.image.get_rect()
         self.rect.center = [pos_x, pos_y]
@@ -384,12 +393,14 @@ class vampire(pygame.sprite.Sprite):
         if self.attackTime == True:
             self.currentimage += 0.1
             self.image = self.listimage[int(self.currentimage)]
+            print(self.currentimage)
             if self.currentimage >= 1.5:
                 self.attackTime = False
         if self.attackTime == False:
             self.currentimage -= 0.1
             self.image = self.listimage[int(self.currentimage)]
-            if self.currentimage <= 0:
+            print(self.currentimage)
+            if self.currentimage <= 0.2:
                 self.attackTime = None
 
 
@@ -483,16 +494,16 @@ class Leviathin(pygame.sprite.Sprite):
         self.armor = defense
         self.maxDmg = maxDmg
 
-        imgOne = pygame.transform.scale2x(pygame.image.load("assets\\sprites\\leviathan_defaultA.png"))
-        imgTwo = pygame.transform.scale2x(pygame.image.load("assets\\sprites\\leviathan_defaultB.png"))
-        imgThree = pygame.transform.scale2x(pygame.image.load("assets\\sprites\\leviathan_defaultC.png"))
+        imgOne = pygame.transform.scale(pygame.image.load("assets\\sprites\\leviathan_defaultA.png"), (250,250))
+        imgTwo = pygame.transform.scale(pygame.image.load("assets\\sprites\\leviathan_defaultB.png"), (250,250))
+        imgThree = pygame.transform.scale(pygame.image.load("assets\\sprites\\leviathan_defaultC.png"), (250,250))
         self.image = imgOne
         self.rect = self.image.get_rect()
         self.rect.center = [pos_x, pos_y]
         self.listimage = []
-        self.listimage.append(pygame.transform.flip(imgOne, True, False))
-        self.listimage.append(pygame.transform.flip(imgTwo, True, False))
-        self.listimage.append(pygame.transform.flip(imgThree, True, False))
+        self.listimage.append(imgOne)
+        self.listimage.append(imgTwo)
+        self.listimage.append(imgThree)
     
         self.currentimage = 0
 
@@ -530,15 +541,79 @@ class Leviathin(pygame.sprite.Sprite):
 
         if self.goDown == True:
             self.rect.y += 1
-            if self.rect.y >= 120:
+            if self.rect.y >= 0:
                 self.goDown = False
                 self.goUp = True
         
         if self.goUp == True:
             self.rect.y -= 1
-            if self.rect.y <= 90:
+            if self.rect.y <= -30:
                 self.goDown = True
                 self.goUp = False
+
+class Magic(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__()
+        imgOne = pygame.image.load("assets\\sprites\\magicparticles_asset1.png")
+        imgTwo = pygame.image.load("assets\\sprites\\magicparticles_asset2.png")
+        imgThree = pygame.image.load("assets\\sprites\\magicparticles_asset3.png")
+        self.heal = 15
+        self.baseDamage = 3
+        self.turnCount = 0
+        self.castedDaze = False
+        self.image = imgOne
+        self.rect = self.image.get_rect()
+        self.rect.center = [pos_x, pos_y]
+
+
+        self.magicList = []
+        self.magicList.append(imgOne)
+        self.magicList.append(imgTwo)
+        self.magicList.append(imgThree)
+
+    def healing(self):
+        merek.health += self.heal
+        self.image = self.magicList[1]
+        self.rect.x = 480
+        self.rect.y = 130
+    def damage(self):
+        print("You cast arcane bolt!")
+        if mantaRay in enemy_group:
+            playerDamage = (r.randrange(5,11)) + self.baseDamage
+            mantaRay.health = mantaRay.health - playerDamage
+            print("Arcane bolt dealt " + str(playerDamage) + " Damage!")
+        if dragon_fish in enemy_group:
+            playerDamage = (r.randrange(5,11)) + self.baseDamage
+            dragon_fish.health = dragon_fish.health - playerDamage
+            print("Arcane bolt dealt " + str(playerDamage) + " Damage!")
+        if vampiir in enemy_group:
+            playerDamage = (r.randrange(5,11)) + self.baseDamage
+            vampiir.health = vampiir.health - playerDamage
+            print("Arcane bolt dealt " + str(playerDamage) + " Damage!")
+        if angler_fish in enemy_group:
+            playerDamage = (r.randrange(5,11)) + self.baseDamage
+            angler_fish.health = angler_fish.health - playerDamage
+            print("Arcane bolt dealt " + str(playerDamage) + " Damage!")
+        if final in enemy_group:
+            playerDamage = (r.randrange(5,11)) + self.baseDamage
+            final.health = final.health - playerDamage
+            print("Arcane bolt dealt " + str(playerDamage) + " Damage!")
+    def daze(self):
+        if self.castedDaze == False:
+            print("You daze the enemy! You are able to evade their attack more easily for 3 turns.")
+            self.turnCount = 1
+            merek.armor += 4
+            self.castedDaze = True
+
+    def update(self):
+        if self.turnCount == 3:
+            print("Daze ran off the enemy!")
+            merek.armor -= 4
+
+        
+
+
+
 
 merek = Player(480,130)
 player_group = pygame.sprite.Group()
@@ -549,13 +624,15 @@ menu_assets = pygame.sprite.Group()
 menu_assets.add(arrow)
 
 bolt = Lightning(140, 130)
+mejik = Magic(0,0)
 special_effects = pygame.sprite.Group()
+special_effects.add(mejik)
 
-mantaRay = MantaRay(140,130, 50, 10, 2, 7)
-dragon_fish = dragonFish(140, 130, 50, 12, 3, 8)
-vampiir = vampire(140, 130, 50, 13, 3, 9)
+mantaRay = MantaRay(140,130, 10, 10, 2, 7)
+dragon_fish = dragonFish(140, 130, 10, 12, 3, 8)
+vampiir = vampire(140, 130, 10, 13, 3, 9)
 angler_fish = anglerFish(140, 130, 50, 15, 4, 10)
-final = Leviathin(140, 130, 80, 10, 12)
+final = Leviathin(100, 80, 80, 10, 12, 10)
 enemy_group = pygame.sprite.Group()
 enemy_group.add(mantaRay)
 
@@ -563,25 +640,120 @@ def EndOne():
     pygame.display.quit()
     playmusic.stop()
     mantaRay.kill()
-    EncounterTwo()
+    SceneTwo()
+
 def EndTwo():
     pygame.display.quit()
     playmusic.stop()
     dragon_fish.kill()
-    EncounterThree()
+    SceneThree()
 
 def EndThree():
     pygame.display.quit()
     playmusic.stop()
     vampiir.kill()
-    EncounterFour()
+    SceneFour()
 
 def EndFour():
     pygame.display.quit()
     playmusic.stop()
     angler_fish.kill()
-    EncounterFive()
+    SceneFive()
 
+
+def SceneOne():
+    screen = pygame.display.set_mode((640,360))
+    clock = pygame.time.Clock()
+    #Before the sting ray battle
+    #Scenery, dialogue, etc. for the lead up before tutorial-esque battle.
+    background = pygame.image.load("assets\\backgrounds\\background_encounter1.png")
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    #Insert the story/plot as functions under this line of code
+                    EncounterOne()
+        
+        pygame.display.flip()
+        screen.blit(background, (0,0))
+        clock.tick(20)
+
+def SceneTwo():
+    
+    #Scenery before the dragun
+    background = pygame.image.load("assets\\backgrounds\\background_encounter2.png")
+    screen = pygame.display.set_mode((640,360))
+    clock = pygame.time.Clock()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    #Insert the story/plot as functions under this line of code
+                    EncounterTwo()
+        
+        pygame.display.flip()
+        screen.blit(background, (0,0))
+        clock.tick(20)
+    
+def SceneThree():
+    background = pygame.image.load("assets\\backgrounds\\background_encounter3.png")
+    screen = pygame.display.set_mode((640,360))
+    clock = pygame.time.Clock()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    #Insert the story/plot as functions under this line of code
+                    EncounterThree()
+        
+        pygame.display.flip()
+        screen.blit(background, (0,0))
+        clock.tick(20)
+
+def SceneFour():
+    background = pygame.image.load("assets\\backgrounds\\background_encounter4.png")
+    screen = pygame.display.set_mode((640,360))
+    clock = pygame.time.Clock()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    #Insert the story/plot as functions under this line of code
+                    EncounterFour()
+        
+        pygame.display.flip()
+        screen.blit(background, (0,0))
+        clock.tick(20)
+
+def SceneFive():
+    background = pygame.image.load("assets\\backgrounds\\background_encounter5.png")
+    screen = pygame.display.set_mode((640,360))
+    clock = pygame.time.Clock()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    #Insert the story/plot as functions under this line of code
+                    EncounterFive()
+        
+        pygame.display.flip()
+        screen.blit(background, (0,0))
+        clock.tick(20)
 
 
 def EncounterOne():
@@ -595,6 +767,10 @@ def EncounterOne():
             if event.type == pygame.QUIT:
                 pygame.quit()
             if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    arrow.inMagicMenu = False
+                    arrow.rightness = 3
+                    menu = arrow.defaultMenu
                 if event.key == pygame.K_RETURN:
                     if arrow.inMagicMenu == True:
                         if currentRightArrow == selectedRightArrow:
@@ -683,12 +859,17 @@ def EncounterTwo():
     clock = pygame.time.Clock()
     playmusic.play(enemyBattle)
     enemy_group.add(dragon_fish)
+    background = pygame.image.load("assets\\backgrounds\\background_encounter2.png")
 
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
             if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    arrow.inMagicMenu = False
+                    arrow.rightness = 3
+                    menu = arrow.defaultMenu
                 if event.key == pygame.K_RETURN:
                     if arrow.inMagicMenu == True:
                         if currentRightArrow == selectedRightArrow:
@@ -775,12 +956,17 @@ def EncounterThree():
     clock = pygame.time.Clock()
     playmusic.play(enemyBattle)
     enemy_group.add(vampiir)
+    background = pygame.image.load("assets\\backgrounds\\background_encounter3.png")
 
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
             if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    arrow.inMagicMenu = False
+                    arrow.rightness = 3
+                    menu = arrow.defaultMenu
                 if event.key == pygame.K_RETURN:
                     if arrow.inMagicMenu == True:
                         if currentRightArrow == selectedRightArrow:
@@ -867,12 +1053,17 @@ def EncounterFour():
     clock = pygame.time.Clock()
     playmusic.play(enemyBattle)
     enemy_group.add(angler_fish)
+    background = pygame.image.load("assets\\backgrounds\\background_encounter4.png")
 
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
             if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    arrow.inMagicMenu = False
+                    arrow.rightness = 3
+                    menu = arrow.defaultMenu
                 if event.key == pygame.K_RETURN:
                     if arrow.inMagicMenu == True:
                         if currentRightArrow == selectedRightArrow:
@@ -886,16 +1077,20 @@ def EncounterFour():
                             if menu in arrow.magicMenu3:
                                 menu = arrow.magicMenus[1][remainingCharges2]
                         if currentLeftArrow == leftArrow and currentRightArrow == rightArrow:
-                            if menu in arrow.magicMenu1:
-                                remainingCharges1 += 1
-                                menu = arrow.magicMenus[0][remainingCharges1]
-                            if menu in arrow.magicMenu2:
-                                remainingCharges2 += 1
-                                menu = arrow.magicMenus[1][remainingCharges2]
-                            if menu in arrow.magicMenu3:
-                                remainingCharges3 += 1
-                                menu = arrow.magicMenus[2][remainingCharges3]
-
+                            if remainingCharges1 != 4:
+                                if menu in arrow.magicMenu1:
+                                    remainingCharges1 += 1
+                                    menu = arrow.magicMenus[0][remainingCharges1]
+                            elif remainingCharges2 != 4:
+                                if menu in arrow.magicMenu2:
+                                    remainingCharges2 += 1
+                                    menu = arrow.magicMenus[1][remainingCharges2]
+                            elif remainingCharges3 != 4:
+                                if menu in arrow.magicMenu3:
+                                    remainingCharges3 += 1
+                                    menu = arrow.magicMenus[2][remainingCharges3]
+                            else:
+                                print("Out of magic!")
 
                     if arrow.inMagicMenu == False:
                         if arrow.rightness == 1:
@@ -959,12 +1154,17 @@ def EncounterFive():
     clock = pygame.time.Clock()
     playmusic.play(enemyBattle)
     enemy_group.add(final)
+    background = pygame.image.load("assets\\backgrounds\\background_encounter5.png")
 
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
             if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    arrow.inMagicMenu = False
+                    arrow.rightness = 3
+                    menu = arrow.defaultMenu
                 if event.key == pygame.K_RETURN:
                     if arrow.inMagicMenu == True:
                         if currentRightArrow == selectedRightArrow:
@@ -978,15 +1178,18 @@ def EncounterFive():
                             if menu in arrow.magicMenu3:
                                 menu = arrow.magicMenus[1][remainingCharges2]
                         if currentLeftArrow == leftArrow and currentRightArrow == rightArrow:
-                            if menu in arrow.magicMenu1:
-                                remainingCharges1 += 1
-                                menu = arrow.magicMenus[0][remainingCharges1]
-                            if menu in arrow.magicMenu2:
-                                remainingCharges2 += 1
-                                menu = arrow.magicMenus[1][remainingCharges2]
-                            if menu in arrow.magicMenu3:
-                                remainingCharges3 += 1
-                                menu = arrow.magicMenus[2][remainingCharges3]
+                            if remainingCharges1 != 4:
+                                if menu in arrow.magicMenu1:
+                                    remainingCharges1 += 1
+                                    menu = arrow.magicMenus[0][remainingCharges1]
+                            if remainingCharges2 != 4:
+                                if menu in arrow.magicMenu2:
+                                    remainingCharges2 += 1
+                                    menu = arrow.magicMenus[1][remainingCharges2]
+                            if remainingCharges3 != 4:
+                                if menu in arrow.magicMenu3:
+                                    remainingCharges3 += 1
+                                    menu = arrow.magicMenus[2][remainingCharges3]
 
 
                     if arrow.inMagicMenu == False:
@@ -1045,4 +1248,4 @@ def EncounterFive():
         menu_assets.update()
         clock.tick(20)
 
-EncounterOne()
+SceneOne()
